@@ -1,0 +1,4 @@
+.DS_Store
+build
+elm-stuff
+node_modules

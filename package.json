@@ -1,0 +1,19 @@
+{
+  "name": "workout2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch-css": "mkdir -p ./stylus/build && stylus -w ./stylus/main-2.styl -o ./stylus/build/app-2.css"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "install": "^0.8.1",
+    "nodemon": "^1.9.2",
+    "npm": "^3.9.5",
+    "stylus": "^0.54.5",
+    "uglify-js": "^2.6.2"
+  }
+}
