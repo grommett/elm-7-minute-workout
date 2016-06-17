@@ -5,6 +5,7 @@ import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import ExerciseList exposing (..)
 import ExerciseDescription exposing (..)
+import Workout exposing (..)
 import Timer exposing (..)
 import Time exposing (Time, every, second)
 import Debug
@@ -12,6 +13,7 @@ import Debug
 type Msg
   = SelectExercise ExerciseList.Msg
   | CloseDescription ExerciseDescription.Msg
+  | CloseWorkout Workout.Msg
   | Tick Timer.Msg
   | Toggle
 
@@ -23,7 +25,9 @@ type alias Model =
   , started: Bool
   , displayDescription: Bool
   , timerModel : Timer.Model
+  , workoutModel : Workout.Model
   , exerciseMetaView: String
+  , mode: String
   }
 
 
@@ -47,16 +51,32 @@ update msg model =
 
     CloseDescription msg ->
       ({ model |
-           displayDescription = False
-         , exerciseDescriptionModel = ExerciseDescription.update msg model.exerciseDescriptionModel
-         , exerciseMetaView = ""
-        }, Cmd.none)
+         displayDescription = False
+       , exerciseDescriptionModel = ExerciseDescription.update msg model.exerciseDescriptionModel
+       , exerciseMetaView = ""
+       }, Cmd.none)
+
+    CloseWorkout msg ->
+      ({model | workoutModel = Workout.update msg model.workoutModel }, Cmd.none)
 
     Tick msg ->
-      ({model | timerModel = Timer.update msg model.timerModel}, Cmd.none)
+      {--
+      If in rest mode and not eq 0 -> Tick
+      if in rest mode and eq 0 -> get next exercise and set to 
+       --}
+      ({ model |
+         timerModel = Timer.update msg model.timerModel
+       , workoutModel = Workout.updateCount model.timerModel.countdown model.workoutModel
+       } , Cmd.none)
 
     Toggle ->
-      ({model | timerModel = (Timer.toggle model.timerModel)}, Cmd.none)
+      let
+        newWorkout = Workout.toggle model.workoutModel
+      in
+        ({ model |
+            timerModel = (Timer.toggle model.timerModel)
+          , workoutModel = newWorkout
+          }, Cmd.none)
 
 model: (Model, Cmd Msg)
 model =
@@ -65,8 +85,10 @@ model =
   , started = False
   , displayDescription = False
   , exerciseDescriptionModel = ExerciseDescription.model
+  , workoutModel = Workout.model
   , timerModel = Timer.model
   , exerciseMetaView = ""
+  , mode = "list"
   }, Cmd.none)
 
 view: Model -> Html Msg
@@ -77,7 +99,8 @@ view model =
      [ App.map SelectExercise (ExerciseList.view model.exerciseListModel)
      , App.map CloseDescription (ExerciseDescription.view model.exerciseDescriptionModel)
      ]
-   , button [onClick Toggle] [ text (if model.timerModel.paused then "Resume" else "Pause")]
+   , App.map CloseWorkout (Workout.view model.workoutModel)
+   , button [onClick Toggle] [ text (if model.timerModel.paused then "Start" else "Pause")]
   ]
 
 subscription: Model -> Sub Msg
