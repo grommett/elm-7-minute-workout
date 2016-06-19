@@ -7,7 +7,6 @@ import ExerciseList exposing (..)
 import ExerciseDescription exposing (..)
 import Workout exposing (..)
 import Timer exposing (..)
-import Time exposing (Time, every, second)
 import Debug
 
 type Msg
@@ -17,7 +16,6 @@ type Msg
   | Tick Timer.Msg
   | Toggle
 
-type ChildMsg = Set (ExerciseList.Msg)
 type alias Model =
   { id : Int
   , exerciseListModel : ExerciseList.Model
@@ -60,14 +58,19 @@ update msg model =
       ({model | workoutModel = Workout.update msg model.workoutModel }, Cmd.none)
 
     Tick msg ->
+      let
+        newTimer = Timer.update msg model.timerModel
+        exe = ExerciseList.getExercise newTimer.countdown model.exerciseListModel
+        log = Debug.log "exercise" (toString exe)
       {--
       If in rest mode and not eq 0 -> Tick
-      if in rest mode and eq 0 -> get next exercise and set to 
+      if in rest mode and eq 0 -> get next exercise and set to
        --}
-      ({ model |
-         timerModel = Timer.update msg model.timerModel
-       , workoutModel = Workout.updateCount model.timerModel.countdown model.workoutModel
-       } , Cmd.none)
+      in
+        ({ model |
+           timerModel = newTimer
+         , workoutModel = Workout.updateCount model.timerModel.countdown model.workoutModel
+         } , Cmd.none)
 
     Toggle ->
       let

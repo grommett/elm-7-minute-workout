@@ -1,11 +1,12 @@
-module ExerciseList exposing (Model, Msg(Set), Exercise, model, view, update)
+module ExerciseList exposing (Model, Msg(..), Exercise, model, view, update, getExercise)
 import Html exposing (Html, div, p, ul, li, button, text, section, h1, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Html.App as App
 
-type Msg =
-  Set Exercise
+type Msg
+  = Set Exercise
+  | Select Exercise
 
 type alias Exercise =
   { id: Int
@@ -29,6 +30,8 @@ update msg model =
   case msg of
     Set record ->
       {model| exercise = record, exerciseId = record.id }
+    Select record ->
+      {model| exercise = record, exerciseId = record.id }
 
 defaultExercise: Exercise
 defaultExercise = Exercise 0 "PushUps" "An exercise" 123
@@ -44,9 +47,17 @@ model =
   , exercise = defaultExercise
   }
 
+filterExercises: Int -> Exercise -> Bool
+filterExercises id exercise =
+  exercise.id == id
+
+getExercise: Int -> Model -> Maybe Exercise
+getExercise id model =
+  List.head (List.filter (filterExercises id) model.exercises)
+
 exerciseListItem: Int -> Exercise -> Html Msg
 exerciseListItem num exercise =
-  li [ onClick (Set exercise), class "exercise-item" ]
+  li [ onClick (Select exercise), class "exercise-item" ]
     [ span [class "exercise-item-number"] [text (toString num)]
     , text exercise.name
     , span [ class "exercise-item-arrow"] [ text "›"]

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "html":"mkdir -p ./build && cp ./src/index.html ./build",
     "css": "mkdir -p ./build/css && stylus ./src/stylus/app.styl -o ./build/css/app.css",
-    "elm": "mkdir -p ./build/js && elm make ./src/Main.elm --output ./build/js/elm.js",
+    "elm": "mkdir -p ./build/js && elm make ./src/SevenMinuteWorkout.elm --output ./build/js/elm.js",
     "uglify": "uglifyjs ./build/js/elm.js --compress --mangle -o ./build/js/elm.min.js",
     "build": "npm run html && npm run css && npm run elm && npm run uglify",
     "watch" : "nodemon --watch ./src -e elm,styl --exec \"npm run build\"",
