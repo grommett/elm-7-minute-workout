@@ -1,4 +1,4 @@
-module Workout exposing (Msg, Model, model, view, update, start, updateCount, updateExercise)
+module Workout exposing (Msg, Model, model, view, update, start, updateCount, updateExercise, done)
 import Html exposing (Html, div, text, button, h2, p)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -18,8 +18,8 @@ type Msg
   = Pause
   | Stop
   | Count Int
-  | Start Exercise
-  | Change Exercise
+  | Start Exercise Int
+  | Change Exercise Int
 
 model : Model
 model =
@@ -37,25 +37,33 @@ update msg model =
       {model | viewState = False}
     Count int ->
       {model | count = int}
-    Start record ->
-      { model | exercise = record.name, viewState = True}
-    Change record ->
-      { model | exercise = record.name}
+    Start record duration ->
+      { model | exercise = record.name, count = duration, viewState = True}
+    Change record duration->
+      { model | exercise = record.name, count = duration}
 
 view: Model -> Html Msg
 view model =
-  div [id "exercise-workout-view", class (if model.viewState == True then "open" else "")]
-  [ h2 [] [text model.exercise]
-  , p [] [text (toString model.count)]
-  , button [onClick Stop] [text "Stop"]
-  ]
+  let
+    doneLabel = "Done"
+    stopLabel = "Stop"
+    count = toString model.count
+  in
+    div [id "exercise-workout-view", class (if model.viewState == True then "open" else "")]
+    [ h2 [] [text model.exercise]
+    , p [] [text (if(model.exercise == "Done") then "" else count)]
+    , button [onClick Stop] [text (if model.exercise == "Done" then doneLabel else stopLabel)]
+    ]
 
 updateCount: Int -> Model -> Model
 updateCount int model =
    update (Count int) model
 
-updateExercise record model =
-  update (Change record) model
+updateExercise record duration model =
+  update (Change record duration) model
 
-start record model =
-  update (Start record) model
+start record duration model =
+  update (Start record duration) model
+
+done model =
+  update Stop model

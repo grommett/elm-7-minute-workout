@@ -26,6 +26,17 @@ type alias Model =
   , workout : Workout.Model
   }
 
+restDuration : Int
+restDuration
+  = 5
+
+exerciseDuration: Int
+exerciseDuration
+  = 8
+
+debug: Bool
+debug = False
+
 model: (Model, Cmd Msg)
 model =
   ({ currentTime = 0
@@ -40,8 +51,8 @@ model =
 
 view: Model -> Html Msg
 view model =
-  Html.div [id "app-container"]
-  [p [] [text (toString model)]
+  div [id "app-container"]
+  [p [] [text (if debug then toString model else "")]
    , div [id "exercise-meta", class model.exerciseMetaView]
      [ App.map SelectExercise (ExerciseList.view model.exerciseList)
      , App.map CloseDescription (ExerciseDescription.view model.exerciseDesc)
@@ -55,14 +66,12 @@ update msg model =
   case msg of
     SelectExercise msg ->
       let
-        exercise = ExerciseList.update msg model.exerciseList
-        newExerciseDesc = ExerciseDescription.updateExercise exercise.exercise
+        exerciseList = ExerciseList.update msg model.exerciseList
       in
         ({ model
          | viewState = "description"
-         , exerciseList = exercise
-         , exerciseDesc = newExerciseDesc
-         , exerciseId = exercise.exerciseId
+         , exerciseList = exerciseList
+         , exerciseDesc = ExerciseDescription.updateExercise exerciseList.exercise
          , exerciseMetaView = "view-exercise-description-view"
          }, Cmd.none)
 
@@ -70,11 +79,8 @@ update msg model =
       ({model | viewState = "list", exerciseMetaView= ""}, Cmd.none)
 
     CloseWorkout msg ->
-      let
-        newWorkout = Workout.update msg model.workout
-      in
-        ({ model
-         | workout = newWorkout
+      ({ model
+         | workout = Workout.update msg model.workout
          , timer = (Timer.toggle model.timer)
          }, Cmd.none)
 
@@ -83,22 +89,24 @@ update msg model =
         newTimer = Timer.update msg model.timer
         currentCount = newTimer.countdown
         newWorkout = Workout.updateCount currentCount model.workout
+        timerWorkout = nextExerciseState newTimer newWorkout model currentCount
       in
         ({ model
-         | timer = newTimer
-         , workout = newWorkout
+         | timer = timerWorkout.timer
+         , workout = timerWorkout.workout
+         , exerciseId = timerWorkout.exerciseId
          } , Cmd.none)
 
     Start ->
       let
-        startedWorkout = Workout.start (getExerciseById 0 model.exerciseList) model.workout
-        newTimer = Timer.setCountdown model.timer 5
-        newWorkout = Workout.updateCount newTimer.countdown startedWorkout
+        newWorkout = Workout.start (getExerciseById 0 model.exerciseList) exerciseDuration model.workout
+        newTimer = Timer.setCountdown model.timer exerciseDuration
       in
         ({ model
          | viewState = "exercise"
          , workout = newWorkout
          , timer = (Timer.toggle newTimer)
+         , exerciseId = 0
          }, Cmd.none)
 
 getExerciseById: Int -> ExerciseList.Model -> { id : Int, name : String }
@@ -108,9 +116,28 @@ getExerciseById int model =
   in
     case exercise of
       Just value ->
-        {id = value.id, name = value.name}
+        { id = value.id, name = value.name }
       Nothing ->
-        {id = -1, name = "Done"}
+        { id = -1, name = "Done" }
+
+nextExerciseState: Timer.Model -> Workout.Model -> Model -> Int -> {exerciseId: Int, timer: Timer.Model, workout: Workout.Model}
+nextExerciseState timer workout model count =
+  let
+    exerciseId = model.exerciseId + 1
+    lastWorkout = workout.exercise
+    nextWorkout = Workout.updateExercise (getExerciseById exerciseId model.exerciseList) exerciseDuration workout
+    exerciseTimer = Timer.setCountdown model.timer exerciseDuration
+    restTimer = Timer.setCountdown model.timer restDuration
+    restWorkout = Workout.updateExercise {id=-1, name="Rest"} restDuration workout
+  in
+    if count < 0 && nextWorkout.exercise == "Done" then
+      { exerciseId = model.exerciseId, timer = timer, workout = nextWorkout }
+    else if count < 0 && lastWorkout == "Rest" then
+      { exerciseId = exerciseId, timer = exerciseTimer, workout = nextWorkout }
+    else if count < 0 && lastWorkout /= "Rest" then
+      { exerciseId = model.exerciseId, timer = restTimer, workout = restWorkout }
+    else
+      { exerciseId = model.exerciseId, timer = timer, workout = workout }
 
 subscription: Model -> Sub Msg
 subscription model =

@@ -12,6 +12,7 @@ type alias Model =
   , name: String
   , description: String
   , videoId: Int
+  , color: String
   }
 
 updateExercise record =
@@ -23,6 +24,7 @@ model =
   , name = ""
   , description = ""
   , videoId = -1
+  , color = ""
   }
 
 update: Msg -> Model -> Model

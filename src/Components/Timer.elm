@@ -22,7 +22,8 @@ update msg model =
   case msg of
     Tick _->
       { model
-      | countdown = (if model.countdown - 1 < 0 then 0 else model.countdown - 1)
+      | countdown = model.countdown - 1
+      , paused = (if model.countdown < 0 then True else False)
       }
 
     Toggle ->

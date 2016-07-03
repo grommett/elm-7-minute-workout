@@ -1,0 +1,40 @@
+colorList = {
+  red: {
+    color: #E74C3C,
+    numColor: #C0392C
+  },
+  gray: {
+    color: #94A5A6,
+    numColor: #7F8C8D
+  },
+  blue: {
+    color: #3398DB,
+    numColor: #2980B9
+  },
+  darkBlue: {
+    color: #34495E,
+    numColor: #2C3E50
+  },
+  green: {
+    color: #19BC9C,
+    numColor: #17A085
+  },
+  purple: {
+    color: #9B59B6,
+    numColor: #8E44AD
+  },
+  lime: {
+    color: #2ECC71,
+    numColor: #27AE60
+  },
+  orange: {
+    color: #E67E22,
+    numColor: #D35400
+  }
+}
+
+for key in colorList
+  .{key}
+    background-color: colorList[key].color
+    .exercise-item-number
+      background-color: colorList[key].numColor
