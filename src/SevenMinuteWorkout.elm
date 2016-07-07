@@ -18,7 +18,6 @@ type Msg
 type alias Model =
   { currentTime: Int
   , viewState: String
-  , exerciseMetaView: String
   , exerciseId: Int
   , exerciseList : ExerciseList.Model
   , exerciseDesc: ExerciseDescription.Model
@@ -41,7 +40,6 @@ model: (Model, Cmd Msg)
 model =
   ({ currentTime = 0
   , viewState = "loading"
-  , exerciseMetaView = ""
   , exerciseId = 0
   , exerciseList = ExerciseList.model
   , exerciseDesc = ExerciseDescription.model
@@ -53,10 +51,8 @@ view: Model -> Html Msg
 view model =
   div [id "app-container"]
   [p [] [text (if debug then toString model else "")]
-   , div [id "exercise-meta", class model.exerciseMetaView]
-     [ App.map SelectExercise (ExerciseList.view model.exerciseList)
-     , App.map CloseDescription (ExerciseDescription.view model.exerciseDesc)
-     ]
+   , App.map SelectExercise (ExerciseList.view model.exerciseList)
+   , App.map CloseDescription (ExerciseDescription.view model.exerciseDesc)
    , App.map CloseWorkout (Workout.view model.workout)
    , button [onClick Start] [text "Start"]
   ]
@@ -71,12 +67,15 @@ update msg model =
         ({ model
          | viewState = "description"
          , exerciseList = exerciseList
-         , exerciseDesc = ExerciseDescription.updateExercise exerciseList.exercise
-         , exerciseMetaView = "view-exercise-description-view"
+         , exerciseDesc = ExerciseDescription.updateExercise { viewState=True, exercise = exerciseList.exercise }
          }, Cmd.none)
 
     CloseDescription msg ->
-      ({model | viewState = "list", exerciseMetaView= ""}, Cmd.none)
+      let
+        exeDesc = ExerciseDescription.update msg model.exerciseDesc
+        exeList = ExerciseList.open model.exerciseList
+      in
+        ({model | viewState = "list", exerciseDesc= exeDesc, exerciseList = exeList}, Cmd.none)
 
     CloseWorkout msg ->
       ({ model

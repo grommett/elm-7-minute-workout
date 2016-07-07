@@ -1,5 +1,5 @@
 module Workout exposing (Msg, Model, model, view, update, start, updateCount, updateExercise, done)
-import Html exposing (Html, div, text, button, h2, p)
+import Html exposing (Html, section, text, button, h2, p)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
@@ -49,7 +49,7 @@ view model =
     stopLabel = "Stop"
     count = toString model.count
   in
-    div [id "exercise-workout-view", class (if model.viewState == True then "open" else "")]
+    section [id "exercise-workout-view", class (if model.viewState == True then "open" else "")]
     [ h2 [] [text model.exercise]
     , p [] [text (if(model.exercise == "Done") then "" else count)]
     , button [onClick Stop] [text (if model.exercise == "Done" then doneLabel else stopLabel)]

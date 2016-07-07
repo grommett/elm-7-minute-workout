@@ -1,4 +1,4 @@
-module ExerciseList exposing (Model, Msg(..), Exercise, model, view, update, getExercise)
+module ExerciseList exposing (Model, Msg(..), Exercise, model, view, update, getExercise, open)
 import Html exposing (Html, div, p, ul, li, button, text, section, h1, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -7,18 +7,20 @@ import Html.App as App
 type Msg
   = Set Exercise
   | Select Exercise
+  | Open
 
 type alias Exercise =
   { id: Int
   , name: String
   , description: String
-  , videoId: Int
+  , videoId: String
   , color: String
   }
 
 
 type alias Model =
-  { exercises: List Exercise
+  { viewState : Bool
+  , exercises: List Exercise
   , exerciseId: Int
   , exercise: Exercise
   }
@@ -32,26 +34,29 @@ update msg model =
     Set record ->
       {model| exercise = record, exerciseId = record.id }
     Select record ->
-      {model| exercise = record, exerciseId = record.id }
+      {model| exercise = record, exerciseId = record.id, viewState = False }
+    Open ->
+      {model| viewState = True }
 
 defaultExercise: Exercise
-defaultExercise = Exercise 0 "Jumping Jacks" "An exercise" 123 "red"
+defaultExercise = Exercise 0 "Jumping Jacks" "An exercise" "1b98WrRrmUs" "red"
 
 model: Model
 model =
-  { exercises =
+  { viewState = True
+  , exercises =
     [ defaultExercise
-    , Exercise 1 "Wall Sits" "An exercise that is wall sits" 456 "gray"
-    , Exercise 2 "Push-ups" "An exercise that is push-ups" 789 "blue"
-    , Exercise 3 "Abdominal crunches" "An exercise that is abdominal crunches" 789 "darkBlue"
-    , Exercise 4 "Step-ups onto a chair" "An exercise that is step-ups onto a chair" 789 "green"
-    , Exercise 5 "Squats" "An exercise that is squats" 789 "purple"
-    , Exercise 6 "Tricep dips on a chair" "An exercise that is tricep dips on a chair" 789 "lime"
-    , Exercise 7 "Planks" "An exercise that is planks" 789 "orange"
-    , Exercise 8 "High knees running in place" "An exercise that is high knees running in place" 789 "red"
-    , Exercise 9 "Lunges" "An exercise that is lunges" 789 "gray"
-    , Exercise 10 "Push-ups and rotations" "An exercise that is push-ups and rotations" 789 "blue"
-    , Exercise 11 "Side planks" "An exercise that is side planks" 789 "darkBlue"
+    , Exercise 1 "Wall Sits" "An exercise that is wall sits" "0RGCezLuP6c" "gray"
+    , Exercise 2 "Push-ups" "An exercise that is push-ups" "dAfVhTXDUNo" "blue"
+    , Exercise 3 "Abdominal crunches" "An exercise that is abdominal crunches" "_YVhhXc2pSY" "darkBlue"
+    , Exercise 4 "Step-ups onto a chair" "An exercise that is step-ups onto a chair" "dG75KOf4EtY" "green"
+    , Exercise 5 "Squats" "An exercise that is squats" "YYHDXY26GjE" "purple"
+    , Exercise 6 "Tricep dips on a chair" "An exercise that is tricep dips on a chair" "3ydgLFLK8e0" "lime"
+    , Exercise 7 "Planks" "An exercise that is planks" "JEkxJKCPiFU" "orange"
+    , Exercise 8 "High knees running in place" "An exercise that is high knees running in place" "_a29JwDaVJw" "red"
+    , Exercise 9 "Lunges" "An exercise that is lunges" "UWgWxKKdycU" "gray"
+    , Exercise 10 "Push-ups with rotations" "An exercise that is push-ups and rotations" "YU0gWh72a3k" "blue"
+    , Exercise 11 "Side planks" "An exercise that is side planks" "IkMmABQ9SkM" "darkBlue"
     ]
   , exerciseId = -1
   , exercise = defaultExercise
@@ -60,6 +65,10 @@ model =
 filterExercises: Int -> Exercise -> Bool
 filterExercises id exercise =
   exercise.id == id
+
+open: Model -> Model
+open model =
+  update Open model
 
 getExercise: Int -> Model -> Maybe Exercise
 getExercise id model =
@@ -83,12 +92,14 @@ exercises exercises =
 
 view: Model -> Html Msg
 view model =
-  section [id "exercise-list", class "exercise-meta-view view-exercise-view"]
-  [ h1 [] [text "The 7 Minute Workout"]
-  , p [] [text "Lorem ipsum dolor sit amet, consectetur adipisicing elit."]
-  , ul []
-      (exercises model.exercises)
-  --, button[] [text "Start"]
+  let
+    viewClass = if model.viewState == True then " open" else " closed"
+  in
+    section [id "exercise-list", class ("exercise-meta-view" ++ viewClass)]
+    [ h1 [] [text "The 7 Minute Workout"]
+    , p [] [text "Lorem ipsum dolor sit amet, consectetur adipisicing elit."]
+    , ul []
+        (exercises model.exercises)
   ]
 
 main = view model

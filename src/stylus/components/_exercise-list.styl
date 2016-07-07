@@ -1,4 +1,7 @@
 #exercise-list
+  position: relative
+  transform: translate3d(0,0%,0)
+  transition: transform .2s ease-out, opacity .2s
   ul
     list-style-type: none
     padding: 0
@@ -6,6 +9,12 @@
 
   h1, p
     text-align: center
+  &.open
+    transform: translate3d(0,0,0)
+    opacity: 1
+  &.closed
+    transform: translate3d(-100%,0,0)
+    opacity: 0
 
   .exercise-item
     text-align: left
@@ -28,3 +37,9 @@
       font-size: 30px
       top: 50%
       transform: translateY(-50%)
+
+for key in colorList
+  .{key}
+    background-color: colorList[key].color
+    .exercise-item-number
+      background-color: colorList[key].numColor
