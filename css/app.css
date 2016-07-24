@@ -1,0 +1,365 @@
+#app-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.exercise-meta-view {
+  width: 100%;
+  box-sizing: border-box;
+}
+#exercise-workout-view {
+  top: 0;
+  transform: translate3d(0, 100%, 0);
+  position: fixed;
+  background: #3b3b3b;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.2s ease-out, background-color 0.2s;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+#exercise-workout-view.open {
+  transform: translate3d(0, 0%, 0);
+}
+#exercise-workout-view button {
+  border: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  border-radius: 2px;
+  color: #fff;
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+  padding: 10px;
+  cursor: pointer;
+}
+#exercise-workout-view h2 {
+  text-align: center;
+}
+#exercise-workout-view .counter {
+  position: relative;
+  height: 80%;
+}
+#exercise-workout-view .counter .count,
+#exercise-workout-view .counter svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#exercise-workout-view .counter .count {
+  font-size: 125px;
+}
+#exercise-workout-view .counter circle {
+  transition: 1s linear;
+}
+#exercise-workout-view .counter circle.circle-bkg {
+  opacity: 0.75;
+  stroke: #fff;
+}
+#exercise-workout-view.red {
+  background-color: #e74c3c;
+}
+#exercise-workout-view.red button {
+  background-color: #c0392c;
+}
+#exercise-workout-view.red circle.circle-percent {
+  stroke: #c0392c;
+  opacity: 1;
+}
+#exercise-workout-view.gray {
+  background-color: #94a5a6;
+}
+#exercise-workout-view.gray button {
+  background-color: #7f8c8d;
+}
+#exercise-workout-view.gray circle.circle-percent {
+  stroke: #7f8c8d;
+  opacity: 1;
+}
+#exercise-workout-view.blue {
+  background-color: #3398db;
+}
+#exercise-workout-view.blue button {
+  background-color: #2980b9;
+}
+#exercise-workout-view.blue circle.circle-percent {
+  stroke: #2980b9;
+  opacity: 1;
+}
+#exercise-workout-view.darkBlue {
+  background-color: #34495e;
+}
+#exercise-workout-view.darkBlue button {
+  background-color: #2c3e50;
+}
+#exercise-workout-view.darkBlue circle.circle-percent {
+  stroke: #2c3e50;
+  opacity: 1;
+}
+#exercise-workout-view.green {
+  background-color: #19bc9c;
+}
+#exercise-workout-view.green button {
+  background-color: #17a085;
+}
+#exercise-workout-view.green circle.circle-percent {
+  stroke: #17a085;
+  opacity: 1;
+}
+#exercise-workout-view.purple {
+  background-color: #9b59b6;
+}
+#exercise-workout-view.purple button {
+  background-color: #8e44ad;
+}
+#exercise-workout-view.purple circle.circle-percent {
+  stroke: #8e44ad;
+  opacity: 1;
+}
+#exercise-workout-view.lime {
+  background-color: #2ecc71;
+}
+#exercise-workout-view.lime button {
+  background-color: #27ae60;
+}
+#exercise-workout-view.lime circle.circle-percent {
+  stroke: #27ae60;
+  opacity: 1;
+}
+#exercise-workout-view.orange {
+  background-color: #e67e22;
+}
+#exercise-workout-view.orange button {
+  background-color: #d35400;
+}
+#exercise-workout-view.orange circle.circle-percent {
+  stroke: #d35400;
+  opacity: 1;
+}
+#exercise-list {
+  position: relative;
+  transform: translate3d(0, 0%, 0);
+  transition: transform 0.2s ease-out, opacity 0.2s;
+}
+#exercise-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#exercise-list h1,
+#exercise-list p {
+  text-align: center;
+}
+#exercise-list h1 {
+  font-weight: 300;
+}
+#exercise-list.open {
+  transform: translate3d(0, 0, 0);
+}
+#exercise-list.closed {
+  transform: translate3d(-100%, 0, 0);
+}
+#exercise-list .exercise-item {
+  text-align: left;
+  padding: 0;
+  position: relative;
+  cursor: pointer;
+}
+#exercise-list .exercise-item .exercise-item-number {
+  font-size: 25px;
+  padding: 20px 25px;
+  display: inline-block;
+  min-width: 30px;
+  text-align: center;
+  margin-right: 10px;
+}
+#exercise-list .exercise-item .exercise-item-arrow {
+  position: absolute;
+  right: 0;
+  padding-right: 5px;
+  font-size: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.red {
+  background-color: #e74c3c;
+}
+.red .exercise-item-number {
+  background-color: #c0392c;
+}
+.gray {
+  background-color: #94a5a6;
+}
+.gray .exercise-item-number {
+  background-color: #7f8c8d;
+}
+.blue {
+  background-color: #3398db;
+}
+.blue .exercise-item-number {
+  background-color: #2980b9;
+}
+.darkBlue {
+  background-color: #34495e;
+}
+.darkBlue .exercise-item-number {
+  background-color: #2c3e50;
+}
+.green {
+  background-color: #19bc9c;
+}
+.green .exercise-item-number {
+  background-color: #17a085;
+}
+.purple {
+  background-color: #9b59b6;
+}
+.purple .exercise-item-number {
+  background-color: #8e44ad;
+}
+.lime {
+  background-color: #2ecc71;
+}
+.lime .exercise-item-number {
+  background-color: #27ae60;
+}
+.orange {
+  background-color: #e67e22;
+}
+.orange .exercise-item-number {
+  background-color: #d35400;
+}
+#exercise-description {
+  position: fixed;
+  top: 0;
+  left: 100%;
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.2s ease-out, opacity 0.3s;
+}
+#exercise-description.open {
+  transform: translate3d(-100%, 0, 0);
+}
+#exercise-description header {
+  position: absolute;
+  z-index: 10;
+  box-sizing: border-box;
+  width: 100%;
+}
+#exercise-description header h2 {
+  margin: 0;
+  text-align: center;
+  font-weight: 300;
+}
+#exercise-description header,
+#exercise-description p {
+  padding: 20px;
+}
+#exercise-description .exercise-description-close {
+  cursor: pointer;
+  background-color: #d15419;
+  border-radius: 10px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  right: 20px;
+}
+#exercise-description .video-container {
+  position: relative;
+  padding-top: 54.15%;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+}
+#exercise-description .video-container .video {
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#exercise-description.red header {
+  background-color: #e74c3c;
+}
+#exercise-description.red .exercise-description-close,
+#exercise-description.red .video-container {
+  background-color: #c0392c;
+}
+#exercise-description.gray header {
+  background-color: #94a5a6;
+}
+#exercise-description.gray .exercise-description-close,
+#exercise-description.gray .video-container {
+  background-color: #7f8c8d;
+}
+#exercise-description.blue header {
+  background-color: #3398db;
+}
+#exercise-description.blue .exercise-description-close,
+#exercise-description.blue .video-container {
+  background-color: #2980b9;
+}
+#exercise-description.darkBlue header {
+  background-color: #34495e;
+}
+#exercise-description.darkBlue .exercise-description-close,
+#exercise-description.darkBlue .video-container {
+  background-color: #2c3e50;
+}
+#exercise-description.green header {
+  background-color: #19bc9c;
+}
+#exercise-description.green .exercise-description-close,
+#exercise-description.green .video-container {
+  background-color: #17a085;
+}
+#exercise-description.purple header {
+  background-color: #9b59b6;
+}
+#exercise-description.purple .exercise-description-close,
+#exercise-description.purple .video-container {
+  background-color: #8e44ad;
+}
+#exercise-description.lime header {
+  background-color: #2ecc71;
+}
+#exercise-description.lime .exercise-description-close,
+#exercise-description.lime .video-container {
+  background-color: #27ae60;
+}
+#exercise-description.orange header {
+  background-color: #e67e22;
+}
+#exercise-description.orange .exercise-description-close,
+#exercise-description.orange .video-container {
+  background-color: #d35400;
+}
+body {
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  background-color: #e47e30;
+  color: #fff;
+}
+button {
+  border: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  border-radius: 2px;
+  color: #fff;
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+  padding: 10px;
+  cursor: pointer;
+}
+.start-btn {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: #d35400;
+}
