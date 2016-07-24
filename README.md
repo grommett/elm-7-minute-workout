@@ -3,7 +3,7 @@ Seven-Minute Workout built with Elm
 https://grommett.github.io/elm-7-minute-workout/
 
 ## Credit
-UI copied from 7 Minute Workout App in the Apple App store.
+UI and UX copied from 7 Minute Workout App in the Apple App store.
 
 ## Goals
 * Build an application with Elm
