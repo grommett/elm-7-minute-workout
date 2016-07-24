@@ -2,6 +2,7 @@
   position: relative
   transform: translate3d(0,0%,0)
   transition: transform .2s ease-out, opacity .2s
+  
   ul
     list-style-type: none
     padding: 0
@@ -9,12 +10,13 @@
 
   h1, p
     text-align: center
+
+  h1
+    font-weight: 300
   &.open
     transform: translate3d(0,0,0)
-    opacity: 1
   &.closed
     transform: translate3d(-100%,0,0)
-    opacity: 0
 
   .exercise-item
     text-align: left

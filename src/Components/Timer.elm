@@ -9,12 +9,14 @@ type Msg
 type alias Model =
   { countdown : Int
   , paused : Bool
+  , duration : Int
   }
 
 model: Model
 model =
   { countdown = 10
   , paused = True
+  , duration = 10
   }
 
 update: Msg -> Model -> Model
@@ -27,16 +29,20 @@ update msg model =
       }
 
     Toggle ->
-      {model | paused = not model.paused}
+      { model | paused = not model.paused }
 
     SetCountDown int ->
-      {model | countdown = int}
+      { model | countdown = int, duration = int }
 
 toggle: Model -> Model
 toggle model =
   update Toggle model
 
-setCountdown: Model -> Int -> Model
+getDuration : Int
+getDuration =
+  model.duration
+
+setCountdown : Model -> Int -> Model
 setCountdown model int =
   update (SetCountDown int) model
 

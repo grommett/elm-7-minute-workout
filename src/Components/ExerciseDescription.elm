@@ -1,68 +1,69 @@
 module ExerciseDescription exposing (Model, Msg, updateExercise, view, update, model)
+import Exercise exposing (Exercise)
 import Html exposing (Html, div, p, text, br, button, h2, section, header, iframe)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 
 type Msg =
   Close
-  | Change Model
+  | Change Exercise
 
 type alias Model =
   { viewState : Bool
-  , exercise :
-      { id: Int
-      , name: String
-      , description: String
-      , videoId: String
-      , color: String
-      }
+  , exercise : Exercise
   }
+
 
 youtubeUrl: String -> String
 youtubeUrl id =
   "https://www.youtube.com/embed/" ++ id
 
-updateExercise record =
-  update (Change record) model
+updateExercise : Maybe Exercise -> Model -> Model
+updateExercise newExercise model =
+  case newExercise of
+    Just value ->
+      update (Change value) model
+    Nothing ->
+      model
 
-model: Model
+model : Model
 model =
   { viewState = False
-  , exercise =
-      { id = -1
-      , name = ""
-      , description = ""
-      , videoId = ""
-      , color = ""
-      }
+  , exercise = Exercise "No exercise" "red" -1 "-1"
   }
 
 update: Msg -> Model -> Model
 update msg model =
   case msg of
     Close ->
-      {model | viewState = False}
+      let
+        current = model.exercise
+        newExercise = { current | id = -1 }
+      in
+        { model | viewState = False, exercise = newExercise }
 
-    Change newExerciseModel ->
-      newExerciseModel
+    Change newExercise ->
+      { model | viewState = True, exercise = newExercise }
 
 view: Model -> Html Msg
 view model =
   let
-    viewClass = if(model.viewState == True) then " open" else ""
+    viewClass = if (model.viewState == True) then " open" else ""
   in
     section [id "exercise-description", class ("exercise-meta-view" ++ viewClass ++ " " ++ model.exercise.color)]
     [ header []
-      [ h2 [] [text model.exercise.name]
-      , div [onClick Close, class "exercise-description-close"]
-        [text "✖"]
+      [ h2 [] [text model.exercise.name ]
+      , div [ onClick Close, class "exercise-description-close" ]
+        [ text "✖" ]
       ]
-      , div [class "video-container"]
+      , div [ class "video-container" ]
         [
           if model.viewState == True then
-            iframe [class "video", src (youtubeUrl model.exercise.videoId)] []
+            iframe [ class "video", src (youtubeUrl model.exercise.videoId) ] []
           else
-            p[] [text ""]
+            text ""
         ]
-      , p[][text model.exercise.description]
     ]
+
+main =
+  view model

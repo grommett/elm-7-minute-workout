@@ -5,8 +5,46 @@
   background: #3b3b3b
   width: 100%
   height: 100%
-  transition: transform .2s ease-out
+  transition: transform .2s ease-out, background-color .2s
   padding: 0 20px
   box-sizing: border-box
   &.open
     transform: translate3d(0,0%,0)
+  button
+    border: none
+    font-family: 'Open Sans', sans-serif
+    font-size: 16px
+    border-radius: 2px
+    color: #fff
+    display: block
+    margin: 0 auto
+    width: 50%
+    padding: 10px
+    cursor: pointer
+  h2
+    text-align: center
+
+  .counter
+    position: relative
+    height: 80%
+    .count, svg
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+    .count
+      font-size: 125px
+    circle
+      transition: 1s linear
+    circle.circle-bkg
+      opacity: .75
+      stroke: #fff
+
+for key in colorList
+  #exercise-workout-view.{key}
+    background-color: colorList[key].color
+    button
+      background-color: colorList[key].numColor
+    circle.circle-percent
+      stroke: colorList[key].numColor
+      opacity: 1

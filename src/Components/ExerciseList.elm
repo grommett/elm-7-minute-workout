@@ -1,105 +1,175 @@
-module ExerciseList exposing (Model, Msg(..), Exercise, model, view, update, getExercise, open)
+module ExerciseList exposing (Model, Msg(..), init, view, update, getExercise, open)
+import Exercise exposing (Exercise)
 import Html exposing (Html, div, p, ul, li, button, text, section, h1, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Html.App as App
+import Http
+import Json.Decode as Json exposing(..)
+import Task
+
+
+main =
+  App.program
+  { init = init
+  , view = view
+  , update = update
+  , subscriptions = subscriptions
+  }
 
 type Msg
-  = Set Exercise
-  | Select Exercise
+  = GetExercises
   | Open
+  | Select Exercise
+  | FetchSucceed (List (String, ExerciseProps))
+  | FetchFail Http.Error
 
-type alias Exercise =
-  { id: Int
-  , name: String
-  , description: String
-  , videoId: String
-  , color: String
-  }
-
+type alias Exercises =
+  List Exercise
 
 type alias Model =
-  { viewState : Bool
-  , exercises: List Exercise
-  , exerciseId: Int
-  , exercise: Exercise
+  { exercises: Exercises
+  , exercise: Maybe Exercise
+  , viewState: String
+  , errorMessage: String
   }
 
-currentExercise =
-  model.exercise
+type alias ExerciseProps =
+  { color: String
+  , id: Int
+  , videoId: String
+  }
 
-update: Msg -> Model -> Model
+-- Model --
+
+init: (Model, Cmd Msg)
+init =
+  (Model [] Nothing "Loading" "") ! [ getExerciseList ]
+
+emptyExercise: Exercise
+emptyExercise =
+  Exercise "" "" -1 ""
+
+-- HTTP --
+
+getExerciseList : Cmd Msg
+getExerciseList =
+  let
+    url =
+      "//testing-35f49.firebaseio.com/exercises.json"
+    log = Debug.log "fetch" "getting list!"
+  in
+    Task.perform FetchFail FetchSucceed (Http.get decodeExerciseList url)
+
+-- Update --
+
+update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Set record ->
-      {model| exercise = record, exerciseId = record.id }
-    Select record ->
-      {model| exercise = record, exerciseId = record.id, viewState = False }
+    GetExercises ->
+      let
+        log = Debug.log "geting exercises" msg
+      in
+        { model | viewState = "Loading" } ! [ getExerciseList ]
+
+    Select exercise ->
+      ({ model | exercise = Just exercise, viewState="closed" }, Cmd.none)
+
     Open ->
-      {model| viewState = True }
+      ({ model | viewState="open" }, Cmd.none)
 
-defaultExercise: Exercise
-defaultExercise = Exercise 0 "Jumping Jacks" "An exercise" "1b98WrRrmUs" "red"
+    FetchSucceed exercises ->
+      let
+        sorted = List.map tupleToRecord ({--List.take 4 <| --}List.sortWith sortById exercises)
+        log = Debug.log "FetchSucceed" sorted
+      in
+        ({model | exercises = sorted, viewState="Loaded", exercise = Nothing }, Cmd.none)
 
-model: Model
-model =
-  { viewState = True
-  , exercises =
-    [ defaultExercise
-    , Exercise 1 "Wall Sits" "An exercise that is wall sits" "0RGCezLuP6c" "gray"
-    , Exercise 2 "Push-ups" "An exercise that is push-ups" "dAfVhTXDUNo" "blue"
-    , Exercise 3 "Abdominal crunches" "An exercise that is abdominal crunches" "_YVhhXc2pSY" "darkBlue"
-    , Exercise 4 "Step-ups onto a chair" "An exercise that is step-ups onto a chair" "dG75KOf4EtY" "green"
-    , Exercise 5 "Squats" "An exercise that is squats" "YYHDXY26GjE" "purple"
-    , Exercise 6 "Tricep dips on a chair" "An exercise that is tricep dips on a chair" "3ydgLFLK8e0" "lime"
-    , Exercise 7 "Planks" "An exercise that is planks" "JEkxJKCPiFU" "orange"
-    , Exercise 8 "High knees running in place" "An exercise that is high knees running in place" "_a29JwDaVJw" "red"
-    , Exercise 9 "Lunges" "An exercise that is lunges" "UWgWxKKdycU" "gray"
-    , Exercise 10 "Push-ups with rotations" "An exercise that is push-ups and rotations" "YU0gWh72a3k" "blue"
-    , Exercise 11 "Side planks" "An exercise that is side planks" "IkMmABQ9SkM" "darkBlue"
-    ]
-  , exerciseId = -1
-  , exercise = defaultExercise
-  }
+    FetchFail error ->
+      let
+        errorMessage = "Error loading the exercises!"
+        log = Debug.log "error" error
+      in
+        (Model [] Nothing "Error" errorMessage, Cmd.none)
 
-filterExercises: Int -> Exercise -> Bool
-filterExercises id exercise =
-  exercise.id == id
-
-open: Model -> Model
-open model =
-  update Open model
-
-getExercise: Int -> Model -> Maybe Exercise
-getExercise id model =
-  List.head (List.filter (filterExercises id) model.exercises)
-
-exerciseListItem: Int -> Exercise -> Html Msg
-exerciseListItem num exercise =
-  li [ onClick (Select exercise), class ("exercise-item " ++ exercise.color) ]
-    [ span [class "exercise-item-number"] [text (toString num)]
-    , text exercise.name
-    , span [ class "exercise-item-arrow"] [ text "›"]
-    ]
-
-exercises: List Exercise -> List (Html Msg)
-exercises exercises =
-  let
-    num = 0
-    dom = List.indexedMap (\int exe -> exerciseListItem (int+1) exe) exercises
-  in
-    dom
+-- View --
 
 view: Model -> Html Msg
 view model =
   let
-    viewClass = if model.viewState == True then " open" else " closed"
+    viewClass =
+      if model.viewState == "closed" then
+        " closed"
+      else
+        " open"
   in
-    section [id "exercise-list", class ("exercise-meta-view" ++ viewClass)]
-    [ h1 [] [text "The 7 Minute Workout"]
-    , p [] [text "Lorem ipsum dolor sit amet, consectetur adipisicing elit."]
+    section [ id "exercise-list", class ("exercise-meta-view" ++ viewClass) ]
+    [ h1 [] [ text "The 7 Minute Workout" ]
+    , p [] [ text "Lorem ipsum dolor sit amet, consectetur adipisicing elit." ]
     , ul []
-        (exercises model.exercises)
+        <| List.indexedMap (\int exercise -> exerciseListItem int exercise)  model.exercises
   ]
 
-main = view model
+exerciseListItem: Int -> Exercise -> Html Msg
+exerciseListItem num exercise =
+  let
+    delay = num * 1
+    delayString = (toString delay) ++ "s"
+  in
+    li [ onClick (Select exercise), class ("exercise-item " ++ exercise.color), style[("transition-delay", delayString)] ]
+      [ span [ class "exercise-item-number"] [ text (toString num) ]
+      , text exercise.name
+      , span [ class "exercise-item-arrow"] [ text "›" ]
+      ]
+
+-- Subscriptions --
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.none
+
+-- Decoders --
+
+decodeExercise : Decoder ExerciseProps
+decodeExercise =
+  object3 ExerciseProps
+      ("color" := string)
+      ("id" := int)
+      ("videoId" := string)
+
+decodeExerciseList : Decoder (List ( String, ExerciseProps ))
+decodeExerciseList =
+   decodeExercise
+   |> keyValuePairs
+
+-- API --
+
+open: Model -> (Model, Cmd Msg)
+open model =
+  update Open model
+
+getExercise: Int -> Exercises -> Exercise
+getExercise id exercises =
+  let
+    found = exercises
+      |> List.filter (\exercise -> exercise.id == id)
+      |> List.head
+  in
+    case found of
+      Just val ->
+        val
+      Nothing ->
+        emptyExercise
+
+-- Helpers --
+
+sortById: (String, ExerciseProps) -> (String, ExerciseProps) -> Order
+sortById a b =
+  case compare (snd a |> .id) (snd b |> .id) of
+    GT -> GT
+    EQ -> EQ
+    LT -> LT
+
+tupleToRecord: (String, ExerciseProps) -> Exercise
+tupleToRecord (str, props) =
+  { name = str, id = props.id, color = props.color, videoId = props.videoId }
